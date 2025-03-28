@@ -9,12 +9,15 @@ typedef struct {
 } Job;
 
 // Comparison function for sorting jobs based on profit-to-resource ratio
-int compare(const void *a, const void *b) {
-    Job *jobA = (Job *)a;
-    Job *jobB = (Job *)b;
-    if (jobA->ratio < jobB->ratio) return 1; // Sort in descending order
-    if (jobA->ratio > jobB->ratio) return -1;
+int compare(Job jobA, Job jobB) {
+    if (jobA.ratio < jobB.ratio) return 1; // Sort in descending order
+    if (jobA.ratio > jobB.ratio) return -1;
     return 0;
+}
+
+// Wrapper function to adapt the compare function for qsort
+int compareWrapper(const void *a, const void *b) {
+    return compare(*(Job *)a, *(Job *)b);
 }
 
 void allocateResources(Job jobs[], int n, int totalResources) {
@@ -23,8 +26,8 @@ void allocateResources(Job jobs[], int n, int totalResources) {
         jobs[i].ratio = (float)jobs[i].profit / jobs[i].resources;
     }
     
-    // Sort jobs based on profit-to-resource ratio
-    qsort(jobs, n, sizeof(Job), compare);
+    // Sort jobs based on profit-to-resource ratio using the wrapper
+    qsort(jobs, n, sizeof(Job), compareWrapper);
 
     int totalProfit = 0;
     int resourcesUsed = 0;
